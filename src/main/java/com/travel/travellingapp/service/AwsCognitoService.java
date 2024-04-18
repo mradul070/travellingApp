@@ -59,12 +59,10 @@ public class AwsCognitoService {
             throw new CognitoException("An account with the given email already exists.", e.getStatusCode());
         } catch (InvalidPasswordException e) {
             throw new CognitoException("Invalid Password format.", e.getStatusCode());
+        }  catch (CodeDeliveryFailureException e) {
+            throw new CognitoException("Failed to send configuration code try again ", e.getStatusCode());
         } catch (AmazonCognitoIdentityException e) {
             throw new CognitoException(e.getMessage(), e.getStatusCode());
-        } catch (CodeDeliveryFailureException e) {
-            throw new CognitoException("Failed to send configuration code try again ", e.getStatusCode());
-        } catch(Exception e) {
-            throw e;
         }
     }
     public void sendVerificationCode(String email) {
@@ -76,10 +74,8 @@ public class AwsCognitoService {
             throw new CognitoException("An account with the given email already exists.", e.getStatusCode());
         } catch (CodeDeliveryFailureException e) {
             throw new CognitoException("Failed to send configuration code try again.", e.getStatusCode());
-        } catch(AmazonCognitoIdentityException e) {
-            throw new CognitoException("Verification code Expired.", e.getStatusCode());
-        } catch(Exception e) {
-            throw e;
+        } catch (AmazonCognitoIdentityException e) {
+            throw new CognitoException(e.getMessage(), e.getStatusCode());
         }
 
     }
@@ -95,10 +91,8 @@ public class AwsCognitoService {
             throw new CognitoException("Verification code validation fail.", e.getStatusCode());
         } catch(ExpiredCodeException e) {
             throw new CognitoException("Verification code Expired try again.", e.getStatusCode());
-        } catch(AmazonCognitoIdentityException e) {
-            throw new CognitoException("Verification code Expired.", e.getStatusCode());
-        } catch(Exception e) {
-            throw e;
+        } catch (AmazonCognitoIdentityException e) {
+            throw new CognitoException(e.getMessage(), e.getStatusCode());
         }
     }
     public SignInResponseDto signIn(SignInRequestDto signInRequestDto) {
@@ -118,13 +112,13 @@ public class AwsCognitoService {
             signInResponseDto.setRefreshToken(authenticationResult.getRefreshToken());
             return signInResponseDto;
         } catch (UserNotConfirmedException e) {
-            throw new CognitoException("User is not registered", e.getStatusCode());
+            throw new CognitoException("User is not registered. Please register before signing in.", e.getStatusCode());
         } catch(UserNotFoundException e) {
-            throw new CognitoException("User is not found", e.getStatusCode());
+            throw new CognitoException("User not found", e.getStatusCode());
         } catch(NotAuthorizedException e) {
             throw new CognitoException("Invalid User name and password", e.getStatusCode());
-        } catch(Exception e) {
-            throw e;
+        } catch (AmazonCognitoIdentityException e) {
+            throw new CognitoException(e.getMessage(), e.getStatusCode());
         }
     }
 
@@ -135,11 +129,11 @@ public class AwsCognitoService {
             .withUsername(email);
         cognitoIdentityProvider.forgotPassword(forgotPasswordRequest);
         } catch (UserNotFoundException e) {
-            throw new CognitoException("User not found exception", e.getStatusCode());
+            throw new CognitoException("User not found", e.getStatusCode());
         } catch (CodeDeliveryFailureException e) {
-            throw new CognitoException("Failed to send configuration code try again ", e.getStatusCode());
-        } catch(Exception e) {
-            throw e;
+            throw new CognitoException("Failed to send code try again ", e.getStatusCode());
+        } catch (AmazonCognitoIdentityException e) {
+            throw new CognitoException(e.getMessage(), e.getStatusCode());
         }
     }
     public void confirmForgetPassword(String email, String code, String password) {
@@ -158,8 +152,8 @@ public class AwsCognitoService {
             throw new CognitoException("Invalid Password format.", e.getStatusCode());
         } catch(UserNotFoundException e) {
             throw new CognitoException("User not found", e.getStatusCode());
-        } catch(Exception e) {
-            throw e;
+        } catch (AmazonCognitoIdentityException e) {
+            throw new CognitoException(e.getMessage(), e.getStatusCode());
         }
     }
 }
